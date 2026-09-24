@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Usuario implements UserDetails {
+public class Usuario implements UserDetails { //UserDetails usuário padrão do Spring Boot
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
@@ -33,9 +33,9 @@ public class Usuario implements UserDetails {
     private String preferenciaIdioma;
     private LocalDate criadoEm;
 
+    //associação de habitos
     @OneToMany(mappedBy = "usuario")
     private Collection<Habito> habitos;
-
 
     //associação de perfis
     @ManyToMany(fetch = FetchType.EAGER)
