@@ -36,6 +36,8 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario")
     private Collection<Habito> habitos;
 
+
+    //associação de perfis
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "usuarios_perfis",
             joinColumns = @JoinColumn(name = "usuarios_id", referencedColumnName = "id"),
