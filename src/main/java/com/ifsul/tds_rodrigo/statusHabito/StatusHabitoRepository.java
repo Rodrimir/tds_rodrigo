@@ -1,8 +1,8 @@
 package com.ifsul.tds_rodrigo.statusHabito;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.UUID;
-
-public interface StatusHabitoRepository extends JpaRepository<StatusHabito, UUID> {
+@RepositoryRestResource(exported = false)
+public interface StatusHabitoRepository extends JpaRepository<StatusHabito, Long> {
 }

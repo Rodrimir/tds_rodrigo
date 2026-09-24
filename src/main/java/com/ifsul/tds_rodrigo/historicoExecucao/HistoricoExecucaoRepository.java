@@ -1,8 +1,8 @@
 package com.ifsul.tds_rodrigo.historicoExecucao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.UUID;
-
-public interface HistoricoExecucaoRepository extends JpaRepository<HistoricoExecucao, UUID> {
+@RepositoryRestResource(exported = false)
+public interface HistoricoExecucaoRepository extends JpaRepository<HistoricoExecucao, Long> {
 }

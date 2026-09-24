@@ -9,57 +9,35 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration //classe de configuração do spring boot
-@EnableWebSecurity //habilita a segurança web
-@EnableMethodSecurity(securedEnabled = true) //habilita a granularidade de segurança por método (nos controllers)
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
-    @Bean //injeta no Context do app o gerenciador de autenticação
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean //injeta no Context do app o esquema de encriptação
+    @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean //personaliza as configurações da cadeia de filtros (lembre que o starter já pré-configurou)
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
 
-        //Basic Authentication
         http
-                .csrf(csrf -> csrf.disable()) //desabilita a proteção contra ataques Cross-site Request Forger
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers(HttpMethod.POST, "/api/v1/usuarios").permitAll(); //exceto, a rota de login
-                    authorize.anyRequest().authenticated(); //demais rotas devem ser autenticadas
+                    authorize.requestMatchers(HttpMethod.POST, "/api/v1/autenticacao/login").permitAll();
+                    authorize.anyRequest().authenticated();
                 })
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
-
-    //Este método é utilizado para autenticar em memória (isso é demonstrado antes de avançar para autenticação em banco de dados e JWT)
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.withUsername("user")
-                .password(passwordEncoder.encode("user"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder.encode("admin"))
-                .roles("USER", "ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
-
 }

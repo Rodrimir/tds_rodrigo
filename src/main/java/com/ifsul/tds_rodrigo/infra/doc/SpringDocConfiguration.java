@@ -7,17 +7,17 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration //indica que essa classe deve ser adicionada ao Contexto do aplicativo como um Bean de Configuração da Documentação da API
+@Configuration
 public class SpringDocConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Exemplo Desenvolvida para as Aulas de TDS")
-                        .description("API Rest da aplicação tads_app_exemplo, contendo as funcionalidades, principalmente, para CRUD de produtos.")
+                        .title("API de Acompanhamento de Hábitos")
+                        .description("API Rest da aplicação tds_rodrigo, contendo as funcionalidades para CRUD de hábitos e usuários.")
                         .contact(new Contact()
-                                .name("Time Aulas TDS")
-                                .email("tds@ifsul.edu.br"))
+                                .name("Rodrigo Miranda da Silva")
+                                .email("rodrigo.miranda.silva.rms@gmail.com"))
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("http://localhost:8080/api/licenca")));

@@ -4,10 +4,8 @@ services:
     container_name: tds_rodrigo_db
     restart: unless-stopped
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: mariadb
+      MARIADB_DATABASE: tds_rodrigo
     ports:
       - "3307:3306"
     volumes:

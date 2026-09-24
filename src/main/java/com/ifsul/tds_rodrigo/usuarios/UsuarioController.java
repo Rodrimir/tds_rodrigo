@@ -2,8 +2,11 @@ package com.ifsul.tds_rodrigo.usuarios;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -11,46 +14,74 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    public UsuarioController(UsuarioRepository usuarioRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioDto> findById(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok(usuarioRepository.findById(id).map(UsuarioDto::new).orElse(null));
-    }
-
-    @Secured("ROLE_ADMIN")
     @GetMapping
-    public ResponseEntity<List<UsuarioDto>> findById() {
-        return ResponseEntity.ok(usuarioRepository.findAll().stream()
-
-                .map(UsuarioDto::new)
-                .toList());
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<List<UsuarioDtoResponse>> findAll() {
+        return ResponseEntity.ok(usuarioRepository.findAll().stream().map(UsuarioDtoResponse::new).toList());
     }
 
-    @Secured("ROLE_ADMIN")
+    @GetMapping("/{id}")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<UsuarioDtoResponse> findById(@PathVariable Long id) {
+        var optionalUsuario = usuarioRepository.findById(id);
+        return optionalUsuario.map(usuario -> ResponseEntity.ok(new UsuarioDtoResponse(usuario)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping
-    public String insert(@RequestBody Usuario usuario) {
-        return "insert";
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<String> insert(@RequestBody UsuarioDtoPost usuarioDTOPost, UriComponentsBuilder uriBuilder) {
+        var u = usuarioRepository.save(new Usuario(
+                null,
+                usuarioDTOPost.nome(),
+                usuarioDTOPost.email(),
+                bCryptPasswordEncoder.encode(usuarioDTOPost.senha()),
+                usuarioDTOPost.fusoHorario(),
+                usuarioDTOPost.preferenciaIdioma(),
+                LocalDate.now(),
+                null,
+                null
+        ));
+        var location = uriBuilder.path("api/v1/usuarios/{id}").buildAndExpand(u.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
-    @Secured("ROLE_ADMIN")
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        return "delete";
+    @PutMapping("{id}")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<UsuarioDtoResponse> update(@PathVariable Long id, @RequestBody UsuarioDtoPut usuarioDTOPut) {
+        var optionalUsuario = usuarioRepository.findById(id);
+        if (optionalUsuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var usuario = optionalUsuario.get();
+        var u = usuarioRepository.save(new Usuario(
+                id,
+                usuarioDTOPut.nome(),
+                usuarioDTOPut.email(),
+                usuario.getSenha(),
+                usuarioDTOPut.fusoHorario(),
+                usuarioDTOPut.preferenciaIdioma(),
+                usuario.getCriadoEm(),
+                null,
+                usuario.getPerfis()
+        ));
+        return ResponseEntity.ok(new UsuarioDtoResponse(u));
     }
 
-    @Secured("ROLE_ADMIN")
-    @PutMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return "update";
+    @DeleteMapping("{id}")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
-
-    //    public static void main(String[] args) {
-//        BCryptPasswordEncoder enconder = new BCryptPasswordEncoder();
-//        String senha = enconder.encode("senha");
-//    }
 }
