@@ -1,6 +1,7 @@
 package com.ifsul.tds_rodrigo.habito;
 
 import com.ifsul.tds_rodrigo.usuarios.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class HabitoController {
 
     @PostMapping
     @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<String> insert(@RequestBody HabitoDtoPost habitoDTOPost, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<String> insert(@Valid @RequestBody HabitoDtoPost habitoDTOPost, UriComponentsBuilder uriBuilder) {
         var optionalUsuario = usuarioRepository.findById(habitoDTOPost.usuarioId());
         if (optionalUsuario.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -73,7 +74,7 @@ public class HabitoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<HabitoDtoResponse> update(@PathVariable Long id, @RequestBody HabitoDtoPut habitoDTOPut) {
+    public ResponseEntity<HabitoDtoResponse> update(@PathVariable Long id, @Valid @RequestBody HabitoDtoPut habitoDTOPut) {
         var optionalHabito = habitoRepository.findById(id);
         if (optionalHabito.isEmpty()) {
             return ResponseEntity.notFound().build();

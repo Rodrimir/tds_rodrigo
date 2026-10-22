@@ -1,5 +1,6 @@
 package com.ifsul.tds_rodrigo.usuarios;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,7 +38,7 @@ public class UsuarioController {
 
     @PostMapping
     @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<String> insert(@RequestBody UsuarioDtoPost usuarioDTOPost, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<String> insert(@Valid @RequestBody UsuarioDtoPost usuarioDTOPost, UriComponentsBuilder uriBuilder) {
         var u = usuarioRepository.save(new Usuario(
                 null,
                 usuarioDTOPost.nome(),
@@ -55,7 +56,7 @@ public class UsuarioController {
 
     @PutMapping("{id}")
     @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<UsuarioDtoResponse> update(@PathVariable Long id, @RequestBody UsuarioDtoPut usuarioDTOPut) {
+    public ResponseEntity<UsuarioDtoResponse> update(@PathVariable Long id, @Valid @RequestBody UsuarioDtoPut usuarioDTOPut) {
         var optionalUsuario = usuarioRepository.findById(id);
         if (optionalUsuario.isEmpty()) {
             return ResponseEntity.notFound().build();
